@@ -3,27 +3,20 @@ const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ChannelTyp
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
-const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, getDoc } = require('firebase/firestore');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
-// Firebaseの設定
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-};
-
-console.log('Initializing Firebase with config:', {
-  ...firebaseConfig,
-  apiKey: '***' // APIキーは隠す
+// Firebase Admin SDKの初期化
+initializeApp({
+  credential: cert({
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+  })
 });
 
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+// Firestoreの初期化
+const db = getFirestore();
 
 // Initialize Discord Bot
 const client = new Client({
@@ -94,7 +87,8 @@ client.on('interactionCreate', async interaction => {
       const roomNumber = crypto.randomBytes(3).toString('hex'); // 6文字の部屋番号を生成
 
       // Firestoreに部屋情報を保存
-      await setDoc(doc(db, 'rooms', roomNumber), {
+      const roomRef = db.collection('rooms').doc(roomNumber);
+      await roomRef.set({
         channelId: channel.id,
         guildId: interaction.guildId,
         createdAt: new Date()
@@ -122,9 +116,9 @@ app.get('/api/rooms/:roomId/messages', async (req, res) => {
 
   try {
     // Firestoreから部屋情報を取得
-    const roomDoc = await getDoc(doc(db, 'rooms', roomId));
+    const roomDoc = await db.collection('rooms').doc(roomId).get();
     
-    if (!roomDoc.exists()) {
+    if (!roomDoc.exists) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
@@ -152,9 +146,9 @@ app.post('/api/rooms/:roomId/messages', async (req, res) => {
 
   try {
     // Firestoreから部屋情報を取得
-    const roomDoc = await getDoc(doc(db, 'rooms', roomId));
+    const roomDoc = await db.collection('rooms').doc(roomId).get();
     
-    if (!roomDoc.exists()) {
+    if (!roomDoc.exists) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
