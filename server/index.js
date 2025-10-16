@@ -3,6 +3,21 @@ const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ChannelTyp
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
+const admin = require('firebase-admin');
+
+// Firebase Admin SDKの初期化
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+};
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+const roomsCollection = db.collection('icord_rooms');
 
 // Initialize Discord Bot
 const client = new Client({
@@ -69,11 +84,11 @@ client.on('interactionCreate', async interaction => {
       const channel = interaction.options.getChannel('channel');
       const roomNumber = crypto.randomBytes(3).toString('hex'); // 6文字の部屋番号を生成
 
-      // 部屋情報を保存
-      rooms.set(roomNumber, {
+      // 部屋情報をFirestoreに保存
+      await roomsCollection.doc(roomNumber).set({
         channelId: channel.id,
         guildId: interaction.guildId,
-        createdAt: new Date()
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
       await interaction.reply({
@@ -106,13 +121,16 @@ client.on('messageCreate', async message => {
 // API Endpoints
 app.get('/api/rooms/:roomId/messages', async (req, res) => {
   const { roomId } = req.params;
-  const room = rooms.get(roomId);
-
-  if (!room) {
-    return res.status(404).json({ error: 'Room not found' });
-  }
 
   try {
+    // Firestoreから部屋情報を取得
+    const roomDoc = await roomsCollection.doc(roomId).get();
+    
+    if (!roomDoc.exists) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+
+    const room = roomDoc.data();
     const channel = await client.channels.fetch(room.channelId);
     const messages = await channel.messages.fetch({ limit: 50 });
     
@@ -133,13 +151,16 @@ app.get('/api/rooms/:roomId/messages', async (req, res) => {
 app.post('/api/rooms/:roomId/messages', async (req, res) => {
   const { roomId } = req.params;
   const { content, author } = req.body;
-  const room = rooms.get(roomId);
-
-  if (!room) {
-    return res.status(404).json({ error: 'Room not found' });
-  }
 
   try {
+    // Firestoreから部屋情報を取得
+    const roomDoc = await roomsCollection.doc(roomId).get();
+    
+    if (!roomDoc.exists) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+
+    const room = roomDoc.data();
     const channel = await client.channels.fetch(room.channelId);
     await channel.send(`${author}: ${content}`);
     res.json({ success: true });
