@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ChannelType } = require('discord.js');
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
@@ -25,6 +25,7 @@ const commands = [
       option
         .setName('channel')
         .setDescription('連携するDiscordチャンネルを選択')
+        .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
     )
 ];
@@ -46,11 +47,14 @@ client.once('ready', async () => {
   // スラッシュコマンドを登録
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
   try {
+    console.log('Started refreshing application (/) commands.');
+
     await rest.put(
-      Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
+      Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID),
       { body: commands }
     );
-    console.log('Slash commands registered');
+
+    console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
     console.error('Error registering slash commands:', error);
   }
