@@ -138,15 +138,24 @@ client.on('interactionCreate', async interaction => {
 app.get('/api/rooms/:roomId/messages', async (req, res) => {
   const { roomId } = req.params;
 
+  console.log(`\n=== GET /api/rooms/${roomId}/messages ===`);
+  console.log('Timestamp:', new Date().toISOString());
+
   try {
     // Firestoreから部屋情報を取得
     const roomDoc = await db.collection('rooms').doc(roomId).get();
     
+    console.log(`Room document exists: ${roomDoc.exists}`);
+    
     if (!roomDoc.exists) {
+      console.log(`Room not found in Firestore: ${roomId}`);
+      console.log('Returning 404 error');
       return res.status(404).json({ error: 'Room not found' });
     }
 
     const room = roomDoc.data();
+    console.log(`Room data:`, room);
+    
     const channel = await client.channels.fetch(room.channelId);
     const messages = await channel.messages.fetch({ limit: 50 });
     
@@ -157,10 +166,11 @@ app.get('/api/rooms/:roomId/messages', async (req, res) => {
       timestamp: msg.createdTimestamp
     })).reverse();
 
+    console.log(`Successfully fetched ${formattedMessages.length} messages`);
     res.json({ messages: formattedMessages });
   } catch (error) {
     console.error('Error fetching messages:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -168,17 +178,22 @@ app.post('/api/rooms/:roomId/messages', async (req, res) => {
   const { roomId } = req.params;
   const { content, author } = req.body;
 
+  console.log(`\n=== POST /api/rooms/${roomId}/messages ===`);
+  console.log('Message:', { content, author });
+
   try {
     // Firestoreから部屋情報を取得
     const roomDoc = await db.collection('rooms').doc(roomId).get();
     
     if (!roomDoc.exists) {
+      console.log(`Room not found: ${roomId}`);
       return res.status(404).json({ error: 'Room not found' });
     }
 
     const room = roomDoc.data();
     const channel = await client.channels.fetch(room.channelId);
     await channel.send(`${author}: ${content}`);
+    console.log('Message sent successfully');
     res.json({ success: true });
   } catch (error) {
     console.error('Error sending message:', error);
