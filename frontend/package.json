@@ -6,28 +6,24 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "date-fns": "^4.1.0",
-    "firebase": "^12.4.0",
-    "next": "^15.5.5",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "date-fns": "^2.30.0",
+    "firebase": "^10.6.0",
+    "next": "^14.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^24.7.2",
-    "@types/react": "^19.2.2",
-    "eslint": "^9.37.0",
-    "eslint-config-next": "^15.5.5",
-    "typescript": "^5.9.3"
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.37",
+    "eslint": "^8.53.0",
+    "eslint-config-next": "^14.0.2",
+    "typescript": "^5.2.2"
   },
   "name": "frontend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "license": "ISC"
 }
