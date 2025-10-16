@@ -1,0 +1,8 @@
+{
+  "name": "icord-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "server"
+  ]
+}
