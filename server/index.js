@@ -10,25 +10,32 @@ console.log('=== Server Initialization ===');
 console.log('Environment variables loaded');
 console.log('Firebase Project ID:', process.env.FIREBASE_PROJECT_ID);
 console.log('Discord Client ID:', process.env.DISCORD_CLIENT_ID);
+console.log('Discord Bot Token exists:', !!process.env.DISCORD_BOT_TOKEN);
+console.log('Firebase Private Key exists:', !!process.env.FIREBASE_PRIVATE_KEY);
 
 // Firebase Admin SDKの初期化
 try {
+  // 環境変数の検証
+  if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
+    throw new Error('Missing required Firebase environment variables');
+  }
+
   initializeApp({
     credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,  // ✅ NEXT_PUBLIC_ではなくFIREBASE_を使用
+      projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
     })
   });
-  console.log('Firebase Admin SDK initialized successfully');
+  console.log('✅ Firebase Admin SDK initialized successfully');
 } catch (error) {
-  console.error('Failed to initialize Firebase Admin SDK:', error);
+  console.error('❌ Failed to initialize Firebase Admin SDK:', error);
   process.exit(1);
 }
 
 // Firestoreの初期化
 const db = getFirestore();
-console.log('Firestore initialized');
+console.log('✅ Firestore initialized');
 
 // Initialize Discord Bot
 const client = new Client({
@@ -189,6 +196,19 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
+// Discord エラーハンドリング
+client.on('error', error => {
+  console.error('❌ Discord client error:', error);
+});
+
+client.on('warn', info => {
+  console.warn('⚠️ Discord client warning:', info);
+});
+
+client.on('shardError', error => {
+  console.error('❌ Discord shard error:', error);
+});
+
 // API Endpoints
 app.get('/api/rooms/:roomId/messages', async (req, res) => {
   const { roomId } = req.params;
@@ -270,7 +290,12 @@ app.post('/api/rooms/:roomId/messages', async (req, res) => {
 
 // Error handling
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
 });
 
 // Start server
@@ -278,7 +303,17 @@ const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`\n🚀 Server running on port ${port}`);
   console.log(`📍 API Base URL: http://localhost:${port}/api`);
+  console.log('✅ Express server started successfully');
 });
 
 // Start Discord bot
-client.login(process.env.DISCORD_BOT_TOKEN);
+console.log('🤖 Starting Discord bot login...');
+client.login(process.env.DISCORD_BOT_TOKEN)
+  .then(() => {
+    console.log('✅ Discord bot login successful');
+  })
+  .catch(error => {
+    console.error('❌ Discord bot login failed:', error);
+    console.error('Please check your DISCORD_BOT_TOKEN environment variable');
+    process.exit(1);
+  });
