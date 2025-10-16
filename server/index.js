@@ -84,27 +84,51 @@ client.on('interactionCreate', async interaction => {
         return;
       }
 
-      const roomNumber = crypto.randomBytes(3).toString('hex'); // 6文字の部屋番号を生成
+      const roomNumber = crypto.randomBytes(3).toString('hex');
 
-      // Firestoreに部屋情報を保存
-      const roomRef = db.collection('rooms').doc(roomNumber);
-      await roomRef.set({
-        channelId: channel.id,
-        guildId: interaction.guildId,
-        createdAt: new Date()
-      });
-
+      // 即座に応答（これが重要）
       await interaction.reply({
-        content: `✅ iCord部屋番号が生成されました！\n部屋番号: \`${roomNumber}\`\n連携チャンネル: ${channel.name}\n\nこの部屋番号をiCord.meで入力すると、このチャンネルと接続できます。`,
+        content: `⏳ 部屋番号を生成中...`,
         flags: 64
       });
+
+      // その後、バックグラウンドで保存（エラーハンドリング付き）
+      setImmediate(async () => {
+        try {
+          await db.collection('rooms').doc(roomNumber).set({
+            channelId: channel.id,
+            guildId: interaction.guildId,
+            createdAt: new Date()
+          });
+
+          // 初期メッセージを編集して最終結果を表示
+          await interaction.editReply({
+            content: `✅ iCord部屋番号が生成されました！\n部屋番号: \`${roomNumber}\`\n連携チャンネル: ${channel.name}\n\nこの部屋番号をiCord.meで入力すると、このチャンネルと接続できます。`
+          });
+
+          console.log(`Room created: ${roomNumber} for channel ${channel.name}`);
+        } catch (error) {
+          console.error('Error saving room:', error);
+          try {
+            await interaction.editReply({
+              content: `❌ エラーが発生しました: ${error.message}`
+            });
+          } catch (editError) {
+            console.error('Error editing reply:', editError);
+          }
+        }
+      });
     } catch (error) {
-      console.error('Error creating room:', error);
+      console.error('Error in command handler:', error);
       if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: 'エラーが発生しました。もう一度お試しください。',
-          flags: 64
-        });
+        try {
+          await interaction.reply({
+            content: 'エラーが発生しました。もう一度お試しください。',
+            flags: 64
+          });
+        } catch (replyError) {
+          console.error('Error sending reply:', replyError);
+        }
       }
     }
   }
