@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@firebase/firestore": "^4.7.3",
+    "@opentelemetry/api": "^1.9.0",
     "cors": "^2.8.5",
     "discord.js": "^14.23.2",
     "dotenv": "^17.2.3",
