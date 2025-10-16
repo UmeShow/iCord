@@ -14,7 +14,7 @@ export default function Home() {
       </Head>
 
       <header className={styles.header}>
-        <Image src="/icordlogo.png" alt="iCord Logo" width={40} height={40} />
+        <Image src="/icordlogo.png" alt="iCord Logo" width={120} height={40} />
       </header>
 
       <main className={styles.main}>

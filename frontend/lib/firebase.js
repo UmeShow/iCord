@@ -14,6 +14,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// デバッグ用: ブラウザのコンソールに読み込まれた設定を表示
+console.log("Firebase Config Loaded:", firebaseConfig);
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
