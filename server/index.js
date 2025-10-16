@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, set, get } = require('firebase/database');
+const { getFirestore, doc, setDoc, getDoc } = require('firebase/firestore');
 
 // Firebaseの設定
 const firebaseConfig = {
@@ -13,13 +13,17 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL // Realtime Database用
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
+
+console.log('Initializing Firebase with config:', {
+  ...firebaseConfig,
+  apiKey: '***' // APIキーは隠す
+});
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
-const database = getDatabase(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 // Initialize Discord Bot
 const client = new Client({
@@ -89,12 +93,11 @@ client.on('interactionCreate', async interaction => {
 
       const roomNumber = crypto.randomBytes(3).toString('hex'); // 6文字の部屋番号を生成
 
-      // Firebase Realtime Databaseに部屋情報を保存
-      const roomRef = ref(database, `rooms/${roomNumber}`);
-      await set(roomRef, {
+      // Firestoreに部屋情報を保存
+      await setDoc(doc(db, 'rooms', roomNumber), {
         channelId: channel.id,
         guildId: interaction.guildId,
-        createdAt: Date.now()
+        createdAt: new Date()
       });
 
       await interaction.reply({
@@ -118,15 +121,14 @@ app.get('/api/rooms/:roomId/messages', async (req, res) => {
   const { roomId } = req.params;
 
   try {
-    // Firebase Realtime Databaseから部屋情報を取得
-    const roomRef = ref(database, `rooms/${roomId}`);
-    const snapshot = await get(roomRef);
+    // Firestoreから部屋情報を取得
+    const roomDoc = await getDoc(doc(db, 'rooms', roomId));
     
-    if (!snapshot.exists()) {
+    if (!roomDoc.exists()) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
-    const room = snapshot.val();
+    const room = roomDoc.data();
     const channel = await client.channels.fetch(room.channelId);
     const messages = await channel.messages.fetch({ limit: 50 });
     
@@ -149,15 +151,14 @@ app.post('/api/rooms/:roomId/messages', async (req, res) => {
   const { content, author } = req.body;
 
   try {
-    // Firebase Realtime Databaseから部屋情報を取得
-    const roomRef = ref(database, `rooms/${roomId}`);
-    const snapshot = await get(roomRef);
+    // Firestoreから部屋情報を取得
+    const roomDoc = await getDoc(doc(db, 'rooms', roomId));
     
-    if (!snapshot.exists()) {
+    if (!roomDoc.exists()) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
-    const room = snapshot.val();
+    const room = roomDoc.data();
     const channel = await client.channels.fetch(room.channelId);
     await channel.send(`${author}: ${content}`);
     res.json({ success: true });
