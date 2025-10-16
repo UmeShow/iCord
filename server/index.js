@@ -82,7 +82,6 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === 'settings') {
-    let responded = false;
     try {
       const channel = interaction.options.getChannel('channel');
       if (!channel || channel.type !== ChannelType.GuildText) {
@@ -90,7 +89,6 @@ client.on('interactionCreate', async interaction => {
           content: 'テキストチャンネルを選択してください。',
           ephemeral: true
         });
-        responded = true;
         return;
       }
 
@@ -103,16 +101,13 @@ client.on('interactionCreate', async interaction => {
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
-      if (!responded) {
-        await interaction.reply({
-          content: `✅ iCord部屋番号が生成されました！\n部屋番号: \`${roomNumber}\`\n連携チャンネル: ${channel.name}\n\nこの部屋番号をiCord.meで入力すると、このチャンネルと接続できます。`,
-          ephemeral: true
-        });
-        responded = true;
-      }
+      await interaction.reply({
+        content: `✅ iCord部屋番号が生成されました！\n部屋番号: \`${roomNumber}\`\n連携チャンネル: ${channel.name}\n\nこの部屋番号をiCord.meで入力すると、このチャンネルと接続できます。`,
+        ephemeral: true
+      });
     } catch (error) {
       console.error('Error creating room:', error);
-      if (!responded) {
+      if (!interaction.replied && !interaction.deferred) {
         try {
           await interaction.reply({
             content: 'エラーが発生しました。もう一度お試しください。',
