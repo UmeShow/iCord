@@ -10,6 +10,14 @@
   align-items: center;
   padding-top: 12px;
   gap: 8px;
+  overflow-y: auto;
+}
+
+.boardSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
 }
 
 .iconButton {
@@ -41,4 +49,31 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.addButton {
+  background-color: #36393f;
+}
+
+.addButton:hover {
+  background-color: #43b581;
+  border-radius: 16px;
+}
+
+.plusIcon {
+  color: #43b581;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.addButton:hover .plusIcon {
+  color: white;
+}
+
+.divider {
+  width: 32px;
+  height: 2px;
+  background-color: #36393f;
+  margin: 4px 0;
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { iCordApi } from '../lib/icordApi';
 import styles from '../styles/Dialog.module.css';
 
-const RoomDialog = ({ isOpen, onClose, onConnect }) => {
+const RoomDialog = ({ isOpen, onClose, onConnect, roomHistory = [] }) => {
   const [roomNumber, setRoomNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,6 +31,10 @@ const RoomDialog = ({ isOpen, onClose, onConnect }) => {
     }
   };
 
+  const handleHistoryClick = (roomId) => {
+    setRoomNumber(roomId);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -47,6 +51,25 @@ const RoomDialog = ({ isOpen, onClose, onConnect }) => {
             disabled={isLoading}
           />
           {error && <p className={styles.error}>{error}</p>}
+          
+          {roomHistory.length > 0 && (
+            <div className={styles.historySection}>
+              <h3>接続履歴</h3>
+              <div className={styles.historyList}>
+                {roomHistory.map((room) => (
+                  <button
+                    key={room.id}
+                    type="button"
+                    className={styles.historyItem}
+                    onClick={() => handleHistoryClick(room.id)}
+                  >
+                    <span className={styles.historyName}>{room.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
           <div className={styles.buttonGroup}>
             <button 
               type="button" 

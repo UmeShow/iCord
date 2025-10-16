@@ -53,6 +53,46 @@
   cursor: not-allowed;
 }
 
+.historySection {
+  margin: 16px 0 20px 0;
+}
+
+.historySection h3 {
+  color: #b9bbbe;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.historyItem {
+  background-color: #2f3136;
+  border: 1px solid #202225;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: #dcddde;
+}
+
+.historyItem:hover {
+  background-color: #40444b;
+  border-color: #5865f2;
+}
+
+.historyName {
+  font-size: 0.9rem;
+}
+
 .buttonGroup {
   display: flex;
   justify-content: flex-end;

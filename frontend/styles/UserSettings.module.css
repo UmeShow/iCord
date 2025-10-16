@@ -1,0 +1,213 @@
+.userSettingsContainer {
+  position: relative;
+}
+
+.userButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.userButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userIcon {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.userName {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.userStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #b9bbbe;
+  font-size: 12px;
+}
+
+.onlineDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #43b581;
+}
+
+.settingsPanel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: #2f3136;
+  border-radius: 8px;
+  padding: 16px;
+  width: 280px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.settingsPanel h3 {
+  margin: 0 0 16px 0;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.settingGroup {
+  margin-bottom: 16px;
+}
+
+.settingGroup label {
+  display: block;
+  color: #b9bbbe;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.nameInput {
+  width: 100%;
+  padding: 10px;
+  background-color: #202225;
+  border: 1px solid #202225;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: #5865f2;
+}
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.iconOption {
+  background-color: #202225;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconOption:hover {
+  background-color: #2f3136;
+  border-color: #5865f2;
+}
+
+.iconOption.selected {
+  border-color: #5865f2;
+  background-color: #2f3136;
+}
+
+.iconOption img {
+  border-radius: 50%;
+}
+
+.uploadButton {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background-color: #202225;
+  border: 1px dashed #5865f2;
+  border-radius: 4px;
+  color: #dcddde;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.uploadButton:hover {
+  background-color: #2f3136;
+  border-color: #4752c4;
+}
+
+.customIconPreview {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #202225;
+  border-radius: 4px;
+}
+
+.customIconPreview p {
+  margin: 0 0 8px 0;
+  color: #b9bbbe;
+  font-size: 12px;
+}
+
+.customIconPreview img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #5865f2;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.saveButton,
+.cancelButton {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton {
+  background-color: #5865f2;
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #4752c4;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: white;
+  border: 1px solid #4e5058;
+}
+
+.cancelButton:hover {
+  background-color: #4e5058;
+}

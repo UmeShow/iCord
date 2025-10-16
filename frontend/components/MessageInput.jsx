@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 
-const MessageInput = () => {
-  const [name, setName] = useState('');
+const MessageInput = ({ userName, userIcon, collectionName = 'messages' }) => {
   const [text, setText] = useState('');
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (text.trim() === '' || name.trim() === '') {
-      alert('名前とメッセージを入力してください。');
+    if (text.trim() === '') {
       return;
     }
 
+    const author = userName || '名無し';
+    const icon = userIcon || '/icons/anonymous.png';
+
     try {
-      await addDoc(collection(db, 'messages'), {
+      await addDoc(collection(db, collectionName), {
         text: text,
-        author: name,
+        author: author,
+        icon: icon,
         timestamp: serverTimestamp(),
       });
       setText('');
@@ -28,22 +31,17 @@ const MessageInput = () => {
 
   return (
     <form onSubmit={sendMessage} className={styles.messageInputForm}>
-      <div>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="名前"
-          className={styles.nameInput}
-        />
+      <div className={styles.inputContainer}>
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="メッセージを入力..."
-          className={styles.textInput}
+          className={styles.textInputExpanded}
         />
-        <button type="submit" className={styles.sendButton}>送信</button>
+        <button type="submit" className={styles.sendButtonIcon}>
+          <span className={styles.sendIcon}>→</span>
+        </button>
       </div>
     </form>
   );
