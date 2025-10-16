@@ -1,0 +1,93 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background-color: #36393f;
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 400px;
+  max-width: 90%;
+}
+
+.dialog h2 {
+  color: #ffffff;
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.error {
+  color: #ed4245;
+  margin: 8px 0;
+  font-size: 0.9rem;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #40444b;
+  border: 1px solid #202225;
+  border-radius: 4px;
+  color: #dcddde;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #5865f2;
+}
+
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelButton, .connectButton {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  background-color: #4f545c;
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #686d73;
+}
+
+.cancelButton:disabled, .connectButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.connectButton {
+  background-color: #5865f2;
+  color: white;
+}
+
+.connectButton:hover {
+  background-color: #4752c4;
+}
