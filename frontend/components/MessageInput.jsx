@@ -28,21 +28,23 @@ const MessageInput = () => {
 
   return (
     <form onSubmit={sendMessage} className={styles.messageInputForm}>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="名前"
-        className={styles.nameInput}
-      />
-      <input
-        type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="メッセージを入力..."
-        className={styles.textInput}
-      />
-      <button type="submit" className={styles.sendButton}>送信</button>
+      <div>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="名前"
+          className={styles.nameInput}
+        />
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="メッセージを入力..."
+          className={styles.textInput}
+        />
+        <button type="submit" className={styles.sendButton}>送信</button>
+      </div>
     </form>
   );
 };
