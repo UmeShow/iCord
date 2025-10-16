@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Image from 'next/image';
 import MessageList from '../components/MessageList';
 import MessageInput from '../components/MessageInput';
 import styles from '../styles/Home.module.css';
@@ -12,11 +13,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to iCord
-        </h1>
+      <header className={styles.header}>
+        <Image src="/icordlogo.png" alt="iCord Logo" width={40} height={40} />
+      </header>
 
+      <main className={styles.main}>
         <div className={styles.chatContainer}>
           <MessageList />
           <MessageInput />
