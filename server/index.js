@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ChannelType } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ChannelType, Permissions } = require('discord.js');
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
@@ -19,7 +19,7 @@ admin.initializeApp({
 const db = admin.firestore();
 const roomsCollection = db.collection('icord_rooms');
 
-// Initialize Discord Bot
+// Initialize Discord Bot with required intents and permissions
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -43,12 +43,13 @@ const commands = [
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
     )
+    .setDefaultMemberPermissions('0')  // 管理者のみが使用可能
 ];
 
 // Express server setup
 const app = express();
 app.use(cors({
-  origin: process.env.CORS_ORIGIN
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
 }));
 app.use(express.json());
 
@@ -56,7 +57,7 @@ app.use(express.json());
 const rooms = new Map();
 
 // Discord.js events
-client.once('ready', async () => {
+client.once('clientReady', async () => {
   console.log('Bot is ready!');
   
   // スラッシュコマンドを登録
@@ -64,8 +65,9 @@ client.once('ready', async () => {
   try {
     console.log('Started refreshing application (/) commands.');
 
+    // グローバルコマンドとして登録
     await rest.put(
-      Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID),
+      Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
       { body: commands }
     );
 
@@ -80,8 +82,18 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === 'settings') {
+    let responded = false;
     try {
       const channel = interaction.options.getChannel('channel');
+      if (!channel || channel.type !== ChannelType.GuildText) {
+        await interaction.reply({
+          content: 'テキストチャンネルを選択してください。',
+          ephemeral: true
+        });
+        responded = true;
+        return;
+      }
+
       const roomNumber = crypto.randomBytes(3).toString('hex'); // 6文字の部屋番号を生成
 
       // 部屋情報をFirestoreに保存
@@ -91,16 +103,25 @@ client.on('interactionCreate', async interaction => {
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
-      await interaction.reply({
-        content: `✅ iCord部屋番号が生成されました！\n部屋番号: \`${roomNumber}\`\n連携チャンネル: ${channel.name}\n\nこの部屋番号をiCord.meで入力すると、このチャンネルと接続できます。`,
-        ephemeral: true
-      });
+      if (!responded) {
+        await interaction.reply({
+          content: `✅ iCord部屋番号が生成されました！\n部屋番号: \`${roomNumber}\`\n連携チャンネル: ${channel.name}\n\nこの部屋番号をiCord.meで入力すると、このチャンネルと接続できます。`,
+          ephemeral: true
+        });
+        responded = true;
+      }
     } catch (error) {
       console.error('Error creating room:', error);
-      await interaction.reply({
-        content: 'エラーが発生しました。もう一度お試しください。',
-        ephemeral: true
-      });
+      if (!responded) {
+        try {
+          await interaction.reply({
+            content: 'エラーが発生しました。もう一度お試しください。',
+            ephemeral: true
+          });
+        } catch (replyError) {
+          console.error('Error sending error response:', replyError);
+        }
+      }
     }
   }
 });
