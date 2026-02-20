@@ -1,3 +1,10 @@
+export enum ConversationMode {
+  SHORT_STORY = 'SHORT_STORY',
+  LONG_STORY = 'LONG_STORY',
+  CASUAL = 'CASUAL',
+  CRAZY = 'CRAZY',
+}
+
 export interface ICharacter {
   id?: string; // Firestore Document ID
   ownerId: string;
@@ -16,4 +23,5 @@ export interface ICharacter {
   avatarUrl?: string;
   systemInstruction: string;
   isActive: boolean; // Is the bot currently running?
+  mode?: ConversationMode;
 }

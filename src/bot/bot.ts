@@ -1,9 +1,10 @@
-import { Client, GatewayIntentBits, Partials, Events, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { Client, GatewayIntentBits, Partials, Events, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, REST, Routes } from 'discord.js';
 import { config } from '../config/config';
 import { db } from '../database/firebase';
 import { IUser } from '../database/models/User';
 import { ICharacter } from '../database/models/Character';
 import { generateResponse } from '../ai/gemini';
+import { commands } from './commands';
 
 export const client = new Client({
   intents: [
@@ -17,8 +18,26 @@ export const client = new Client({
 
 const cooldowns = new Map();
 
-client.once(Events.ClientReady, (c) => {
+client.once(Events.ClientReady, async (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`);
+
+  // Register Slash Commands
+  const rest = new REST({ version: '10' }).setToken(config.discord.token);
+
+  try {
+    console.log('Started refreshing application (/) commands.');
+
+    const commandData = commands.map(cmd => cmd.data.toJSON());
+
+    await rest.put(
+      Routes.applicationCommands(config.discord.clientId),
+      { body: commandData },
+    );
+
+    console.log('Successfully reloaded application (/) commands.');
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -114,6 +133,27 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+    // Handle Slash Commands
+    if (interaction.isChatInputCommand()) {
+        const command = commands.find(c => c.data.name === interaction.commandName);
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} was found.`);
+            return;
+        }
+
+        try {
+            await command.execute(client, interaction);
+        } catch (error) {
+            console.error(error);
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: 'There was an error executing this command!', ephemeral: true });
+            } else {
+                await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
+            }
+        }
+        return;
+    }
+
     if (!interaction.isButton()) return;
 
     if (interaction.customId === 'consent_yes') {
@@ -130,4 +170,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
     } else if (interaction.customId === 'consent_no') {
         await interaction.reply({ content: 'Understood. We will not store your data. You cannot use the bot without consent.', ephemeral: true });
     }
+});
+
+// Prevent process from crashing on unhandled errors
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled promise rejection:', error);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught exception:', error);
 });

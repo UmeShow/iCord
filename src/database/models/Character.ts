@@ -1,3 +1,10 @@
+export enum ConversationMode {
+  SHORT_STORY = 'SHORT_STORY',
+  LONG_STORY = 'LONG_STORY',
+  CASUAL = 'CASUAL',
+  CRAZY = 'CRAZY',
+}
+
 export interface ICharacter {
   id?: string; // Firestore Document ID
   ownerId: string; // Discord ID of the creator
@@ -16,4 +23,5 @@ export interface ICharacter {
   avatarUrl?: string; // URL to the avatar image
   systemInstruction: string; // Compiled prompt
   isActive?: boolean;
+  mode?: ConversationMode;
 }

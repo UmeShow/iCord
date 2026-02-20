@@ -3,39 +3,34 @@ import { config } from '../config/config';
 
 const genAI = new GoogleGenerativeAI(config.gemini.apiKey);
 
-const model = genAI.getGenerativeModel({
-  model: config.gemini.model,
-  safetySettings: [
-    {
-      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-      threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-    },
-  ],
-});
-
 export async function generateResponse(prompt: string, history: { role: 'user' | 'model'; parts: string }[], systemInstruction?: string) {
   try {
-    // Note: systemInstruction is supported in newer Gemini models/SDKs. 
-    // If using an older version, prepend it to the history or the first prompt.
-    // For this implementation, we will prepend it to the chat session if provided.
-    
+    // Create a model instance specific to this request to include the character's system instruction
+    const model = genAI.getGenerativeModel({
+      model: config.gemini.model,
+      ...(systemInstruction ? { systemInstruction } : {}),
+      safetySettings: [
+        {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        },
+        {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        },
+        {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH, // Allow "light skinship"
+        },
+        {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        },
+      ],
+    });
+
     const chat = model.startChat({
-      history: [
-        ...(systemInstruction ? [{ role: 'user', parts: [{ text: `System Instruction: ${systemInstruction}` }] }, { role: 'model', parts: [{ text: 'Understood. I will follow these instructions.' }] }] : []),
-        ...history.map(h => ({ role: h.role, parts: [{ text: h.parts }] }))
-      ] as any, // Type casting for simplicity with the SDK types
+      history: history.map(h => ({ role: h.role, parts: [{ text: h.parts }] })),
     });
 
     const result = await chat.sendMessage(prompt);
@@ -43,6 +38,6 @@ export async function generateResponse(prompt: string, history: { role: 'user' |
     return response.text();
   } catch (error) {
     console.error('Error generating response:', error);
-    return "Sorry, I couldn't generate a response at this time. Please try again later.";
+    throw error; // Re-throw to allow caller (BotInstance) to handle retries or fallback
   }
 }

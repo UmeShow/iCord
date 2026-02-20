@@ -19,6 +19,8 @@ export const authOptions: NextAuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   debug: true, // デバッグログを有効化
+  // @ts-expect-error: trustHost is a valid option in NextAuth v4 but might be missing in the type definition
+  trustHost: true, // プロキシやDocker環境下でのホスト認識を改善
   callbacks: {
     async session({ session, token }) {
       if (session.user) {
@@ -27,6 +29,13 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    }
   },
 };
 

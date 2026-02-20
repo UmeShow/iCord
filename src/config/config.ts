@@ -8,7 +8,7 @@ export const config = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
-    model: 'gemini-2.0-flash-exp', // Or 'gemini-1.5-flash' as fallback
+    model: 'gemini-2.5-flash-lite', // Updated to 2.5 Flash Lite
   },
   firebase: {
     projectId: process.env.FIREBASE_PROJECT_ID || '',
