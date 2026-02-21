@@ -27,21 +27,20 @@ export default function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button (Visible only on mobile) */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      {/* Mobile Menu Button - Removed for New UI */}
+      {/* <div className="md:hidden fixed top-4 left-4 z-50">
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="p-2 bg-[#1e1f22] rounded-md text-gray-200"
         >
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
-      </div>
+      </div> */}
 
       {/* Sidebar (Discord-like) */}
       <div className={`
-        fixed inset-y-0 left-0 z-40 w-[72px] bg-[#1e1f22] flex flex-col items-center gap-2 shrink-0 transition-transform duration-300 ease-in-out
-        pt-16 pb-3 md:py-3 md:relative md:translate-x-0
-        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:flex flex-col items-center gap-2 shrink-0 bg-[#1e1f22] w-[72px] py-3
+        hidden 
       `}>
         <Link href="/" className="w-12 h-12 bg-[#313338] rounded-[24px] hover:rounded-[16px] hover:bg-[#5865F2] transition-all duration-200 flex items-center justify-center group mb-2">
           <Home className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
