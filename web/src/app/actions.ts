@@ -343,7 +343,7 @@ export async function generateAIResponse(
     );
   };
 
-  const primaryModel = process.env.XAI_MODEL?.trim() || "grok-4.3";
+  const primaryModel = process.env.XAI_MODEL?.trim() || "grok-4.1-fast";
   const openai = new OpenAI({ apiKey, baseURL: "https://api.x.ai/v1" });
 
   const userName = options?.userName || "User";
