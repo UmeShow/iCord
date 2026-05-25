@@ -13,15 +13,15 @@ export default function MobileNav() {
   }
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#1e1f22] border-t border-[#1f2023] flex items-center justify-around z-50 pb-safe">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-background/95 backdrop-blur border-t border-foreground/10 flex items-center justify-around z-50 pb-safe">
       <Link 
         href="/dashboard"
-        className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
-            pathname === "/dashboard" ? "text-white" : "text-[#949ba4] hover:text-[#dbdee1]"
+        className={`flex flex-col items-center justify-center w-full h-full space-y-1 text-xs ${
+          pathname === "/dashboard" ? "text-foreground" : "text-foreground/60"
         }`}
       >
         <Home className="w-6 h-6" />
-        <span className="text-[10px] font-medium">Home</span>
+        <span className="text-[10px] font-medium">ホーム</span>
       </Link>
       
       <Link 
@@ -32,22 +32,22 @@ export default function MobileNav() {
         // Let's make:
         // /dashboard -> Home (Chat List style on mobile)
         // /dashboard/manage -> Dashboard (Grid style on mobile)
-        className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
-            pathname === "/dashboard/manage" ? "text-white" : "text-[#949ba4] hover:text-[#dbdee1]"
+        className={`flex flex-col items-center justify-center w-full h-full space-y-1 text-xs ${
+          pathname === "/dashboard/manage" ? "text-foreground" : "text-foreground/60"
         }`}
       >
         <LayoutDashboard className="w-6 h-6" />
-        <span className="text-[10px] font-medium">Dashboard</span>
+        <span className="text-[10px] font-medium">管理</span>
       </Link>
 
       <Link 
         href="/dashboard/profile"
-        className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
-            pathname === "/dashboard/profile" ? "text-white" : "text-[#949ba4] hover:text-[#dbdee1]"
+        className={`flex flex-col items-center justify-center w-full h-full space-y-1 text-xs ${
+          pathname === "/dashboard/profile" ? "text-foreground" : "text-foreground/60"
         }`}
       >
         <User className="w-6 h-6" />
-        <span className="text-[10px] font-medium">You</span>
+        <span className="text-[10px] font-medium">マイページ</span>
       </Link>
     </div>
   );

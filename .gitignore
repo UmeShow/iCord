@@ -10,6 +10,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+!.env.example
 .env.*
 
 # Logs
@@ -36,3 +37,7 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+.vercel
+.env*.local
+web/.env
+web/.env.local

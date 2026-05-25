@@ -19,7 +19,7 @@ export default function MobileDashboard() {
     if (status === "unauthenticated") {
       router.push("/");
     } else if (status === "authenticated" && session?.user) {
-      const discordId = (session.user as any).id;
+      const discordId = (session.user as unknown as { id?: string }).id;
       if (discordId) {
         getCharacters(discordId).then((chars) => {
           setCharacters(chars);
@@ -31,87 +31,100 @@ export default function MobileDashboard() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex h-full items-center justify-center bg-[#313338] text-white">
-        <Loader2 className="h-8 w-8 animate-spin text-[#5865F2]" />
+      <div className="flex h-full items-center justify-center bg-background text-foreground">
+        <Loader2 className="h-8 w-8 animate-spin text-foreground/70" />
       </div>
     );
   }
 
   // This view is specifically for the "Dashboard" tab on Mobile (Management view)
   return (
-    <div className="flex flex-col h-full bg-[#313338]">
-        {/* Top Bar */}
-        <div className="h-12 bg-[#313338] border-b border-[#1f2023] flex items-center px-4 shadow-sm shrink-0 justify-between">
-          <h1 className="font-bold text-gray-200 flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-gray-400" />
-            Dashboard
+    <div className="flex flex-col h-full">
+      <div className="sticky top-0 z-10 border-b border-foreground/10 bg-background/90 backdrop-blur">
+        <div className="mx-auto w-full max-w-5xl px-4 py-3 flex items-center justify-between">
+          <h1 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+            <LayoutDashboard className="w-5 h-5" />
+            管理
           </h1>
-          <Link href="/dashboard/new">
-             <Plus className="w-6 h-6 text-[#5865F2]" />
+          <Link
+            href="/dashboard/new"
+            className="inline-flex items-center gap-2 rounded-md bg-foreground text-background px-3 py-1.5 text-sm font-medium hover:bg-foreground/90 transition"
+          >
+            <Plus className="w-4 h-4" />
+            新規
           </Link>
         </div>
+      </div>
 
-        <div className="p-4 overflow-y-auto flex-1 pb-20">
-          <header className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-                {session?.user?.image ? (
-                    <Image 
-                        src={session.user.image} 
-                        alt="User" 
-                        width={40} 
-                        height={40} 
-                        className="rounded-full ring-2 ring-[#1f2023]" 
-                    />
-                ) : (
-                    <div className="w-10 h-10 bg-[#5865F2] rounded-full flex items-center justify-center">
-                        <UserIcon className="w-6 h-6 text-white" />
-                    </div>
-                )}
-                <div>
-                    <h2 className="text-xl font-bold text-gray-100">{session?.user?.name}</h2>
-                    <p className="text-sm text-gray-400">Manage AI Friends</p>
-                </div>
+      <div className="mx-auto w-full max-w-5xl px-4 py-4 flex-1 overflow-y-auto pb-20">
+        <header className="mb-4">
+          <div className="flex items-center gap-3">
+            {session?.user?.image ? (
+              <Image
+                src={session.user.image}
+                alt="User"
+                width={40}
+                height={40}
+                className="rounded-full border border-foreground/10"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center">
+                <UserIcon className="w-6 h-6" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold truncate">{session?.user?.name}</h2>
+              <p className="text-sm text-foreground/70">AIフレンドの管理</p>
             </div>
-          </header>
-
-          <div className="grid grid-cols-1 gap-3">
-              {characters.map((char) => (
-                <div
-                  key={char.id}
-                  className="bg-[#2b2d31] rounded-lg p-3 flex items-center gap-3 cursor-pointer active:bg-[#35373c] transition border border-[#1f2023]"
-                  onClick={() => router.push(`/dashboard/${char.id}`)}
-                >
-                    <div className="relative shrink-0">
-                        {char.avatarUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={char.avatarUrl} alt={char.name} className="w-12 h-12 rounded-full object-cover bg-[#1e1f22]" />
-                        ) : (
-                            <div className="w-12 h-12 bg-[#5865F2] rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                {char.name.substring(0, 1)}
-                            </div>
-                        )}
-                        <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#2b2d31] ${char.isActive ? 'bg-[#23a559]' : 'bg-[#da373c]'}`}></div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-gray-200 truncate">{char.name}</h3>
-                            {char.isActive && <span className="bg-[#5865F2] text-white text-[10px] px-1.5 py-0.5 rounded">BOT</span>}
-                        </div>
-                        <p className="text-xs text-gray-400 truncate">{char.tone || "No description"}</p>
-                    </div>
-                </div>
-              ))}
-              
-              <Link
-                href="/dashboard/new"
-                className="mt-4 flex items-center justify-center p-3 border border-dashed border-[#5865F2] rounded-lg text-[#5865F2] hover:bg-[#5865F2]/10 transition font-medium gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                Create New Friend
-              </Link>
           </div>
+        </header>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {characters.map((char) => (
+            <button
+              key={char.id}
+              className="text-left rounded-lg border border-foreground/10 bg-foreground/5 hover:bg-foreground/10 transition p-4"
+              onClick={() => router.push(`/dashboard/${char.id}`)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-foreground/10 flex items-center justify-center">
+                    {char.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={char.avatarUrl} alt={char.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-base font-semibold">{char.name.substring(0, 1)}</span>
+                    )}
+                  </div>
+                  <div
+                    className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-background ${
+                      char.isActive ? "bg-foreground" : "bg-foreground/30"
+                    }`}
+                  />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold truncate">{char.name}</h3>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded border border-foreground/10 text-foreground/70">
+                      {char.mode || "CASUAL"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/70 truncate">{char.tone || ""}</p>
+                </div>
+              </div>
+            </button>
+          ))}
+
+          <Link
+            href="/dashboard/new"
+            className="sm:col-span-2 rounded-lg border border-dashed border-foreground/20 bg-foreground/5 hover:bg-foreground/10 transition p-4 flex items-center justify-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            新しいフレンドを作成
+          </Link>
         </div>
+      </div>
     </div>
   );
 }

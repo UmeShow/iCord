@@ -1,71 +1,48 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
-import { Settings, Save, AlertTriangle } from "lucide-react";
-import Link from "next/link";
+import { Settings, Save } from "lucide-react";
+import { ThemeSelector } from "@/components/ThemeSelector";
 // We will implement updateProfile action later
 // import { updateProfile } from "../actions"; 
 
 export default function SettingsPage() {
   const { data: session } = useSession();
-  const [nickname, setNickname] = useState(session?.user?.name || "");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    try {
-      // Implement profile update logic here
-      // await updateProfile({ name: nickname });
-      setMessage({ type: 'success', text: "Profile updated! (Not implemented yet)" });
-    } catch (error) {
-       console.error(error);
-      setMessage({ type: 'error', text: "Failed to update profile." });
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   return (
-    <div className="flex flex-col h-full bg-[#313338]">
-      {/* Top Bar */}
-      <div className="h-12 bg-[#313338] border-b border-[#1f2023] flex items-center px-4 shadow-sm shrink-0">
-        <h1 className="font-bold text-gray-200 flex items-center gap-2">
-          <Settings className="w-5 h-5 text-gray-400" />
-          Settings
-        </h1>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <div className="sticky top-0 z-10 border-b border-foreground/10 bg-background/90 backdrop-blur">
+        <div className="mx-auto w-full max-w-2xl px-4 py-3 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-foreground/60" />
+          <h1 className="font-semibold">設定</h1>
+        </div>
       </div>
 
-      <div className="p-8 max-w-2xl mx-auto w-full">
-        <h2 className="text-2xl font-bold mb-6 text-gray-100">My Account</h2>
+      <div className="mx-auto w-full max-w-2xl px-4 py-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6">アカウント</h2>
         
-        <form onSubmit={handleSave} className="space-y-6">
-          <div className="bg-[#2b2d31] p-6 rounded-lg border border-[#1f2023]">
-            <h3 className="text-lg font-medium text-gray-200 mb-4">Profile</h3>
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+          <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-6">
+            <h3 className="text-base font-semibold mb-4">プロフィール</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
+                <label className="block text-xs font-semibold text-foreground/70 mb-1">
                   Nickname
                 </label>
                 <input
                   type="text"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  className="w-full bg-[#1e1f22] border-none text-gray-100 p-2 rounded focus:ring-2 focus:ring-[#5865F2]"
+                  defaultValue=""
+                  className="w-full rounded-md border border-foreground/10 bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-foreground/20"
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
+                <label className="block text-xs font-semibold text-foreground/70 mb-1">
                   Email
                 </label>
-                <div className="text-gray-400 text-sm">
-                  {session?.user?.email}
-                  <span className="ml-2 px-2 py-0.5 bg-green-500/10 text-green-400 text-xs rounded border border-green-500/20">
+                <div className="text-foreground/70 text-sm">
+                  <span className="ml-2 px-2 py-0.5 bg-foreground/5 text-foreground/70 text-xs rounded border border-foreground/10">
                      Verified (Discord)
                   </span>
                 </div>
@@ -73,35 +50,30 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="bg-[#2b2d31] p-6 rounded-lg border border-[#1f2023]">
-            <h3 className="text-lg font-medium text-gray-200 mb-4">Password & Auth</h3>
-            <p className="text-sm text-gray-400 mb-4">
-              Since you logged in with Discord, you don't have a password set.
+          <ThemeSelector />
+
+          <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-6">
+            <h3 className="text-base font-semibold mb-4">パスワード / 認証</h3>
+            <p className="text-sm text-foreground/70 mb-4">
+              Since you logged in with Discord, you don&apos;t have a password set.
               Setting a password will allow you to log in with email/password.
             </p>
             <button
                 type="button"
-                className="px-4 py-2 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded font-medium transition text-sm"
+                className="px-4 py-2 rounded-md bg-foreground text-background hover:bg-foreground/90 font-medium transition text-sm"
                 onClick={() => alert("Password setting not implemented yet.")}
             >
                 Set Password
             </button>
           </div>
 
-          {message && (
-            <div className={`p-3 rounded text-sm ${message.type === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-              {message.text}
-            </div>
-          )}
-
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              disabled={loading}
-              className="flex items-center gap-2 px-6 py-2 bg-[#23a559] hover:bg-[#1a7f44] text-white rounded font-medium transition disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 rounded-md bg-foreground text-background hover:bg-foreground/90 font-medium transition disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {loading ? "Saving..." : "Save Changes"}
+              保存
             </button>
           </div>
         </form>

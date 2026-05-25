@@ -1,58 +1,58 @@
-"use client";
-
-import { useSession, signIn } from "next-auth/react";
 import Image from "next/image";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { ArrowRight } from "lucide-react";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export default function Home() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+export const runtime = "nodejs";
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
-  }, [status, router]);
-
-  if (status === "loading" || status === "authenticated") {
-      return (
-        <div className="flex h-screen items-center justify-center bg-[#0f172a] text-white">
-            <Loader2 className="h-8 w-8 animate-spin text-[#5865F2]" />
-        </div>
-      );
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+  if (session?.user) {
+    redirect("/dashboard");
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#0f172a] to-[#1e1f22]">
-      <div className="max-w-md w-full text-center space-y-8">
-        <div className="flex justify-center mb-8">
-             <Image 
-              src="/icon.png" 
-              alt="iCord.me Logo" 
-              width={80} 
-              height={80} 
-              className="rounded-2xl shadow-2xl shadow-indigo-500/20"
-            />
-        </div>
-        
-        <h1 className="text-4xl font-bold tracking-tight">
-          Welcome to iCord.me
-        </h1>
-        
-        <p className="text-gray-400 text-lg">
-           Your personal AI companion for Discord.
-        </p>
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <div className="rounded-2xl border border-foreground/10 bg-foreground/5 p-8 text-center">
+          <div className="flex justify-center mb-6">
+            <Image src="/icon.png" alt="iCord.me Logo" width={80} height={80} className="rounded-2xl border border-foreground/10" />
+          </div>
 
-        <div className="pt-8">
-            <button
-                onClick={() => signIn("discord")}
-                className="w-full px-8 py-4 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-xl font-bold text-lg transition flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20 group"
+          <h1 className="text-3xl font-bold tracking-tight">iCord.me</h1>
+          <p className="mt-2 text-sm text-foreground/70">Discord上で会話できるAIフレンドを作成・管理できます。</p>
+
+          <div className="pt-6 space-y-3">
+            <a
+              href="/api/auth/signin/discord?callbackUrl=/dashboard"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-[#5865F2] hover:bg-[#4752C4] text-white px-6 py-3 text-sm font-semibold transition group"
             >
-                Login with Discord
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
-            </button>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.444.865-.607 1.25a18.27 18.27 0 00-5.487 0c-.163-.385-.395-.875-.607-1.25a.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 13.107 13.107 0 01-1.872-.892.077.077 0 00-.008-.128 10.2 10.2 0 00.372-.294.075.075 0 00.077-.01c3.928 1.793 8.18 1.793 12.062 0a.075.075 0 00.078.009c.12.098.246.198.373.294a.077.077 0 00-.006.127 12.299 12.299 0 01-1.873.892.076.076 0 00-.041.107c.36.698.77 1.364 1.225 1.994a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.057c.5-4.506-.838-8.429-3.549-11.914a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-.965-2.157-2.156 0-1.193.964-2.157 2.157-2.157 1.193 0 2.156.964 2.156 2.157 0 1.19-.963 2.156-2.156 2.156zm7.975 0c-1.183 0-2.157-.965-2.157-2.156 0-1.193.964-2.157 2.157-2.157 1.193 0 2.157.964 2.157 2.157 0 1.19-.964 2.156-2.157 2.156z"/>
+              </svg>
+              Discordでログイン
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
+            </a>
+
+            <a
+              href="/api/auth/signin/google?callbackUrl=/dashboard"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-md border border-foreground/20 bg-foreground/5 hover:bg-foreground/10 text-foreground px-6 py-3 text-sm font-semibold transition group"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Googleでログイン
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-4 text-center text-xs text-foreground/60">
+          ログイン後、ダッシュボードに移動します。
         </div>
       </div>
     </div>

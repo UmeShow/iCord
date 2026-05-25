@@ -69,6 +69,8 @@ class BotManager {
                 // Case 4: Just update data
                 console.log(`Updating bot for ${character.name}...`);
                 bot.updateCharacter(character);
+                // Ensure bot is started (fetches skipped start if previously failed, or purely updates if running)
+                bot.start();
             }
         }
     }
