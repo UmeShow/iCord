@@ -80,7 +80,7 @@ ${vibe}
     }
 
     const result = await openai.chat.completions.create({
-      model: process.env.XAI_MODEL || "grok-4.1-fast",
+      model: process.env.XAI_MODEL || "grok-4.20-0309-non-reasoning",
       messages: [{ role: "user", content: contentParts }],
       temperature: 0.7,
     });
