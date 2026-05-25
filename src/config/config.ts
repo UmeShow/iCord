@@ -6,9 +6,9 @@ export const config = {
     token: process.env.DISCORD_TOKEN || '',
     clientId: process.env.DISCORD_CLIENT_ID || '',
   },
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY || '',
-    model: 'gemini-2.5-flash-lite', // Updated to 2.5 Flash Lite
+  xai: {
+    apiKey: process.env.XAI_API_KEY || '',
+    model: 'grok-4.20-0309-non-reasoning', // xAI Grok
   },
   firebase: {
     projectId: process.env.FIREBASE_PROJECT_ID || '',

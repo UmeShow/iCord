@@ -34,6 +34,7 @@
     // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
+    "ignoreDeprecations": "5.0",
     "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": false,

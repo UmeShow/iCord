@@ -1,6 +1,7 @@
 import { db } from '../database/firebase';
 import { ICharacter } from '../database/models/Character';
 import { BotInstance } from './BotInstance';
+import { botRegistry } from './BotRegistry';
 
 export class BotManager {
   private bots = new Map<string, BotInstance>();
@@ -40,8 +41,9 @@ export class BotManager {
         return;
     }
 
-    if (!character.botToken) {
-        console.log(`Skipping ${character.name} (No token)`);
+    // Skip if neither Discord nor Web-only mode is configured
+    if (!character.botToken && character.discordTokenRequired !== false) {
+        console.log(`Skipping ${character.name} (No token and discordTokenRequired not explicitly disabled)`);
         return;
     }
     
@@ -52,6 +54,7 @@ export class BotManager {
     const bot = new BotInstance(character);
     await bot.start();
     this.bots.set(character.id!, bot);
+    botRegistry.register(bot);
   }
 
   private updateBot(character: ICharacter) {
@@ -92,5 +95,6 @@ export class BotManager {
       bot.stop();
       this.bots.delete(characterId);
     }
+    botRegistry.unregister(characterId);
   }
 }

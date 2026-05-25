@@ -4,7 +4,7 @@ exports.client = void 0;
 const discord_js_1 = require("discord.js");
 const config_1 = require("../config/config");
 const firebase_1 = require("../database/firebase");
-const gemini_1 = require("../ai/gemini");
+const grok_1 = require("../ai/grok");
 const commands_1 = require("./commands");
 exports.client = new discord_js_1.Client({
     intents: [
@@ -86,7 +86,7 @@ exports.client.on(discord_js_1.Events.MessageCreate, async (message) => {
         // Exclude the current message from history as it is the prompt
         const previousHistory = history.slice(0, -1);
         const currentPrompt = message.content;
-        const response = await (0, gemini_1.generateResponse)(currentPrompt, previousHistory, systemInstruction);
+        const response = await (0, grok_1.generateResponse)(currentPrompt, previousHistory, systemInstruction);
         // Split response if too long (Discord limit 2000)
         if (response.length > 2000) {
             const chunks = response.match(/[\s\S]{1,2000}/g) || [];

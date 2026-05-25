@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BotManager = void 0;
 const firebase_1 = require("../database/firebase");
 const BotInstance_1 = require("./BotInstance");
+const BotRegistry_1 = require("./BotRegistry");
 class BotManager {
     bots = new Map();
     constructor() {
@@ -34,8 +35,9 @@ class BotManager {
         if (character.isActive === false) {
             return;
         }
-        if (!character.botToken) {
-            console.log(`Skipping ${character.name} (No token)`);
+        // Skip if neither Discord nor Web-only mode is configured
+        if (!character.botToken && character.discordTokenRequired !== false) {
+            console.log(`Skipping ${character.name} (No token and discordTokenRequired not explicitly disabled)`);
             return;
         }
         // Check if already running (shouldn't happen with 'added' event but good safety)
@@ -45,6 +47,7 @@ class BotManager {
         const bot = new BotInstance_1.BotInstance(character);
         await bot.start();
         this.bots.set(character.id, bot);
+        BotRegistry_1.botRegistry.register(bot);
     }
     updateBot(character) {
         const bot = this.bots.get(character.id);
@@ -81,6 +84,7 @@ class BotManager {
             bot.stop();
             this.bots.delete(characterId);
         }
+        BotRegistry_1.botRegistry.unregister(characterId);
     }
 }
 exports.BotManager = BotManager;

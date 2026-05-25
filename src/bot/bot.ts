@@ -3,7 +3,7 @@ import { config } from '../config/config';
 import { db } from '../database/firebase';
 import { IUser } from '../database/models/User';
 import { ICharacter } from '../database/models/Character';
-import { generateResponse } from '../ai/gemini';
+import { generateResponse } from '../ai/grok';
 import { commands } from './commands';
 
 export const client = new Client({

@@ -1,6 +1,6 @@
 import { Client, ChatInputCommandInteraction, SlashCommandBuilder, Message, TextChannel } from "discord.js";
 import { Command } from "./Command";
-import { generateResponse } from "../../ai/gemini";
+import { generateResponse } from "../../ai/grok";
 
 export const Shiritori: Command = {
     data: new SlashCommandBuilder()

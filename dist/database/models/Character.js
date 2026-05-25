@@ -7,5 +7,6 @@ var ConversationMode;
     ConversationMode["LONG_STORY"] = "LONG_STORY";
     ConversationMode["CASUAL"] = "CASUAL";
     ConversationMode["CRAZY"] = "CRAZY";
+    ConversationMode["CUSTOM"] = "CUSTOM";
 })(ConversationMode || (exports.ConversationMode = ConversationMode = {}));
 //# sourceMappingURL=Character.js.map

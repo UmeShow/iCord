@@ -1,15 +1,47 @@
 import { ICharacter } from '../database/models/Character';
 export declare class BotInstance {
+    private static activeBotChatChannels;
     private client;
     private character;
     private isRunning;
     private isAutoReply;
     private lastResetTime;
+    private lastWackToken;
     private lastMessageTime;
+    private voiceConnection;
+    private voiceGuildId;
+    private voiceTextChannelId;
+    private voiceActiveSubscriptions;
     constructor(character: ICharacter);
+    get characterId(): string | undefined;
+    get characterName(): string;
+    get characterNickname(): string | undefined;
+    get botUserId(): string | undefined;
+    private getErrorReply;
+    private getGenerationParams;
+    private guessMimeType;
+    private fetchAsBase64;
+    private isImageAttachment;
+    private isAudioAttachment;
+    private transcribeAudioFromAttachment;
+    private static sleep;
     private setupEvents;
     private registerCommands;
     private handleInteraction;
+    private handleBotsChat;
+    private handleVcJoin;
+    private handleVcLeave;
+    private leaveVoice;
+    private voiceConversationHistory;
+    private startVoiceReceiver;
+    private pcmToWav;
+    private runBotChat;
+    private buildBotChatHistory;
+    generateBotChatReply(prompt: string, history: {
+        role: 'user' | 'model';
+        parts: string;
+    }[]): Promise<string>;
+    sendToChannel(channelId: string, content: string): Promise<void>;
     start(): Promise<void>;
     stop(): Promise<void>;
     get currentToken(): string | undefined;
@@ -22,5 +54,6 @@ export declare class BotInstance {
     private updateLastInteraction;
     private isRateLimited;
     private fetchMessageHistory;
+    private fetchDiscordMessageHistory;
 }
 //# sourceMappingURL=BotInstance.d.ts.map

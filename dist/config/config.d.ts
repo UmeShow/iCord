@@ -3,7 +3,7 @@ export declare const config: {
         token: string;
         clientId: string;
     };
-    gemini: {
+    xai: {
         apiKey: string;
         model: string;
     };
